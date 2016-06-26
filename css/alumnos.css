@@ -1,0 +1,16 @@
+#datosPracticas, #materialAlumno, #materialExterno
+{
+	display: none;
+}
+.centrado
+{
+	text-align: center;
+}
+#loaderImageA #loaderImageG, #loaderImage
+{
+  display: none;
+  text-align: center;
+  margin: 5% 0px;
+  width: 100%;
+  height: 100%;
+}

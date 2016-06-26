@@ -1,0 +1,21 @@
+#aceptarSolLab,#altaArticulos, #alumnosSancionados, #aplicaSanciones, #atenderSolicitud, 
+#bajaArticulos,#bajoInventario, #devolucionMaterial, #editar, #eleccionMaterialExt, #enPrestamo,
+#existenciaInventario, #listaArtMtto, #listaMtto, #menuMtto, 
+#pedidoMaterial, #peticionesArticulos, #peticionesPendientes, #practicasRealizadas,
+#sAceptadasLab, #salir, #sancionesAlumnos, #solicitudesEnProceso,  
+#verMasSolicitud, #verMasSolicitud2, #practicasNoRealizadas
+{
+	display: none;
+}
+.centrado
+{
+	text-align: center;
+}
+#loaderImageG, #loaderImage, #loaderImageA
+{
+  display: none;
+  text-align: center;
+  margin: 5% 0px;
+  width: 100%;
+  height: 100%;
+}
