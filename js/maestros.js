@@ -925,8 +925,9 @@ var inicioMaestros = function ()
     			var uso = $("#textarea1").val();
     			var prac = $("#cmbPractica").val();
     			var mat = $("#cmbMateria").val();
-    			var gp  = $("#cmbHoraMat option:selected").text();
-				var gpo = parseInt(gp.substring(0,2))//segun la hora se saca el grupo
+    			/*var gp  = $("#cmbHoraMat option:selected").text();
+				var gpo = parseInt(gp.substring(0,2))//segun la hora se saca el grupo*/
+				var gpo = $("#cmbHoraMat").val();
 				var cant = $("#txtCantAlumnos").val();
 				var n = (($("#tbMaterialSol tr").length)-1);
 				var parametros = "opc=nuevaSol1"+
@@ -1114,7 +1115,7 @@ var inicioMaestros = function ()
 						if (response.comboHr[i]!="") 
 						{
 							hh = ((response.comboHr[i]).substring(0,2)+":00");
-							$("#cmbHoraMat").append($("<option></option>").attr("value",response.cont).text(hh));
+							$("#cmbHoraMat").append($("<option></option>").attr("value",response.comboHr).text(hh));
 						}
 					}
 					$("cmbHoraMat").trigger('contentChanged');
@@ -1420,7 +1421,7 @@ var inicioMaestros = function ()
 	    			//llenar combo
 	    			$("#cmbPeriodoRep").html(" ");
 					$("#cmbPeriodoRep").html("<option value='' disabled selected>Seleccione el Periodo</option>");
-	    			for (var i =0; i< 20; i++) 
+	    			for (var i =0; i< 3; i++) 
 	    			{
 	    				$("#cmbPeriodoRep").append($("<option></option>").attr("value",response.periodos[i]["pdocve"]).text(response.periodos[i]["pdodes"]));
 	    			}
@@ -1463,8 +1464,9 @@ var inicioMaestros = function ()
 			//contenido dinamico
 			var periodo 	= $("#cmbPeriodoRep").val();
 			var materia 	= $("#cmbMateriaRep").val();
-			var h			= $("#cmbHoraMatRep option:selected").text();
-			var horaMat 	= parseInt(h.substring(0,2));
+			/*var h			= $("#cmbHoraMatRep option:selected").text();
+			var horaMat 	= parseInt(h.substring(0,2));*/
+			var horaMat 	= $("#cmbHoraMatRep").val();
 			var practica 	= $("#cmbPracticaRep").val();
 			var fecha  		= $("#txtFechaPracticaRep").val();
 			var horaPract 	= $("#cmbHoraPracticaRep option:selected").text(); 	
@@ -1643,7 +1645,7 @@ var inicioMaestros = function ()
     				{
 						//arreglar la hora
 						hh = ((response.comboHr[i]).substring(0,2)+":00");
-						$("#cmbHoraMatRep").append($("<option></option>").attr("value",response.cont).text(hh));
+						$("#cmbHoraMatRep").append($("<option></option>").attr("value",response.comboHr).text(hh));
 					}
 					$("cmbHoraMatRep").trigger('contentChanged');
 					$('select').material_select();
@@ -1668,8 +1670,9 @@ var inicioMaestros = function ()
     {
     	$("#loaderImage").show();
     	var materia 	= $("#cmbMateriaRep").val();
-    	var hr 			= $("#cmbHoraMatRep option:selected").text();
-    	var hora 		= hr.substring(0,2);
+    	/*var hr 			= $("#cmbHoraMatRep option:selected").text();
+    	var hora 		= hr.substring(0,2);*/
+    	var hora = $("#cmbHoraMatRep").val();
     	var parametros 	= "opc=comboPractRep1"+
     						"&materia="+materia+
     						"&hora="+hora+

@@ -315,10 +315,11 @@ function nombreMaestro($clave)
 }
 function grupo($mat,$per,$pdo,$hor)
 {
-	$matcve  = $mat;
-	$maestro   = $per;
-	$periodo = $pdo;
-	$n 	 	 = (string)$hor;
+	$matcve  	= $mat;
+	$maestro   	= $per;
+	$periodo 	= $pdo;
+	$hora 		= $hor;
+	/*$n 	 	 = (string)$hor;
 	$n2 	 = (string)($n+1);
 	$hora 	 = "";
 	if (strlen($n)==1) 
@@ -344,9 +345,9 @@ function grupo($mat,$per,$pdo,$hor)
 		{
 			$hora 		.= $n2."00";
 		} 
-	}
+	}*/
 	$conexion 		= conectaBDSIE();
-	$consulta 		= sprintf("select GPOCVE from DGRUPO where MATCVE =%s AND PERCVE=%d AND PDOCVE =%s AND (LUNHRA =%s OR MARHRA =%s OR MIEHRA =%s OR JUEHRA =%s OR VIEHRA =%s)",$matcve,$maestro,$periodo,$hora,$hora,$hora,$hora,$hora);
+	$consulta 		= sprintf("select GPOCVE from DGRUPO where MATCVE =%s AND PERCVE=%d AND PDOCVE =%s AND (LUNHRA =%s OR MARHRA =%s OR MIEHRA =%s OR JUEHRA =%s OR VIEHRA =%s) AND GRUBAS = ' ' ",$matcve,$maestro,$periodo,$hora,$hora,$hora,$hora,$hora);
 	$res			= mysql_query($consulta);
 	if($row = mysql_fetch_array($res))
 	{
@@ -531,7 +532,7 @@ function comboPractRep()
 	$comboTitPrac 	= "";
 	$con 			= 0;
 	$conexion		= conectaBDSICLAB();
-	$consulta		= sprintf("select p.clavePractica, p.tituloPractica from lbpracticas p inner join lbsolicitudlaboratorios s on p.clavePractica = s.clavePractica inner join lbcalendarizaciones c on c.claveSolicitud = s.claveSolicitud where c.estatus = 'R' and s.GPOCVE =%s order by p.tituloPractica",$grupo);
+	$consulta		= sprintf("select DISTINCT p.clavePractica, p.tituloPractica from lbpracticas p inner join lbsolicitudlaboratorios s on p.clavePractica = s.clavePractica inner join lbcalendarizaciones c on c.claveSolicitud = s.claveSolicitud where c.estatus = 'R' and s.GPOCVE =%s order by p.tituloPractica",$grupo);
 	$res 			= mysql_query($consulta);
 	while($row = mysql_fetch_array($res))
 	{
@@ -688,7 +689,7 @@ function periodosAn()
 {
 	$periodos 		= array();
 	$conexion		= conectaBDSIE();
-	$consulta		= sprintf("select pdocve,pdodes from DPERIO where PDOINI > '2002-01-01' order by PDOCVE desc limit 20");
+	$consulta		= sprintf("select pdocve,pdodes from DPERIO where PDOINI > '2002-01-01' order by PDOCVE desc limit 3");
 	$res 			= mysql_query($consulta);
 	if($res)
 	{

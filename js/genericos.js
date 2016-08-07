@@ -8,6 +8,7 @@ var inicioGenerico = function()
 	var articulosExt = new Array();
 	var articulosAgregadosExt = new Array();
 	var numArticulosExt = new Array();
+	var bandera = false;
     //Salir del sistema
     var salir = function()
     {
@@ -81,7 +82,6 @@ var inicioGenerico = function()
 					if(response.respuesta || response.respuesta2)
 					{
 						$("#loaderImageG").hide();
-						$("#txtnombreAlumnoPrestamo").val(response.nombre);
 						$("#tabSolPendientesAlumnos").html(" ");
 						$("#tabSolPendientesAlumnos").append(response.renglones);
 						$("#tabSolPendientesAlumnos #btnAtenderPrestamo").on("click",atenderPrestamoMaterial);
@@ -125,6 +125,7 @@ var inicioGenerico = function()
 					$("#txtclavePrestamo").val(response.clavePrestamo);
 					$("#txtcodigoBarrasPrestamo").val("");
 					$("#tbListaMaterialPrestamo").append(response.renglones);
+					$("#txtnombreAlumnoPrestamo").val(response.nombre);
 				}
 				else
 				{
@@ -321,7 +322,7 @@ var inicioGenerico = function()
 					$("#loaderImageG").hide();
 					$("#tabListaSanciones").html("");
 					$("#tabListaSanciones").append(response.renglones);
-					$("#tabListaSanciones #btnQuitaSancion").on("click",quitaSancion);
+					$("#tabListaSanciones .btnQuitaSancion").on("click",quitaSancion);
 				}
 				else
 				{
@@ -350,9 +351,11 @@ var inicioGenerico = function()
 		{
 			$("#loaderImageG").show();
 			$(this).closest("tr").remove();
-			var claveSancion = $(this).attr('name');
+			var claveSancion 	= $(this).attr('name');
+			var claveArt 		= $(this).attr('id');
 			var parametros 	= "opc=quitaSanciones1"+
 								"&claveSancion="+claveSancion+
+								"&claveArt="+claveArt+
 								"&fecha="+fe+
 								"&id="+Math.random();
 			$.ajax({
@@ -852,6 +855,11 @@ var inicioGenerico = function()
 	}
 	var elegirMatExterno = function()
 	{
+		//Limpiar variables
+		articulosExt = Array();
+	    articulosAgregadosExt = Array();
+	    numArticulosExt = Array();
+	    $("#bodyArtExt").html("");
 		var cantAlu 	= parseInt($("#txtCantAlumnosExterno").val());
 		var maxCantAlu 	= parseInt($("#txtCantAlumnosExterno").attr("max"));
     	var minCantAlu 	= parseInt($("#txtCantAlumnosExterno").attr("min"));
@@ -2505,6 +2513,7 @@ var inicioGenerico = function()
 	{
 
 		$("#loaderImageG").show();
+		$("#inicioG").hide();
 		$("#existenciaInventario").hide("slow");
 		$("#pedidoMaterial").hide("slow");
 		$("#bajoInventario").hide("slow");
@@ -2514,7 +2523,6 @@ var inicioGenerico = function()
 		$("#practicasRealizadas").hide("slow");
 		$("#practicasCanceladas").hide("slow");
 		$("#resumenReportes").show("slow");
-
 		var parametros = "opc=datosGrafica1"+
 							"&id="+Math.random();
 		$.ajax({
@@ -2541,14 +2549,15 @@ var inicioGenerico = function()
 			          	vAxis: {title: 'VISITAS', titleTextStyle: {color: 'black'}},
 			          	backgroundColor:'grey ligthten-3',
 			          	legend:{position: 'bottom', textStyle: {color: 'blue', fontSize: 12}},
-			          	width:620,
-			            height:370
+			          	width:950,
+			            height:400
 			        	};
 
 			        	var grafico = new google.visualization.ColumnChart(document.getElementById('grafica'));
 			        	grafico.draw(data, options);
 		      		}
 				}
+
 			},
 			error: function(xhr, ajaxOptions,x)
 			{
@@ -2928,7 +2937,7 @@ var inicioGenerico = function()
 			}
 		});
 	}
-	var articulosSinExistencia = function()
+	/*var articulosSinExistencia = function()
 	{
 		$("#loaderImageG").hide();
 		var parametros = "opc=articulosSinExistencia1"+
@@ -2953,7 +2962,7 @@ var inicioGenerico = function()
 				console.log("Error de conexión");
 			}
 		});
-	}
+	}*/
 	
 	var noRealizadas = function()
 	{
@@ -3169,8 +3178,8 @@ var inicioGenerico = function()
 	$("#btnResumenReportes").on("click",resumenReportes);
 	$("#tabReportesGenericos").on("click",alumnosActuales);
 	$("#tabReportesGenericos").on("click",articuloMasPrestado);
-	$("#tabReportesGenericos").on("click",practicasNR);
-	$("#tabReportesGenericos").on("click",articulosSinExistencia);
+	$("#tabReportesGenericos").on("click",practicasNR);/*
+	$("#tabReportesGenericos").on("click",articulosSinExistencia);*/
 	$("#tabReportesGenericos").on("click",proximosApartados);
 	$("#btnExistenciaInventario").on("click",existenciaInventario);
 	$("#btnBajoInventario").on("click",bajoInventario);

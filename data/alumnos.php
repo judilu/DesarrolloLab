@@ -254,7 +254,7 @@ function guardaEntrada()
 	$hora 			= GetSQLValueString($_POST["hora"],"text");
 	$numControl 	= GetSQLValueString($_POST["nControl"],"text");
 	$conexion 		= conectaBDSICLAB();
-	$query  		= sprintf("insert into lbentradasalumnos values(%s,%s,%s,%s,%s,%s,%s)",$periodo,$numControl,$fecha,$hora,$claveCal,$laboratorio,'I');
+	$query  		= sprintf("insert into lbentradasalumnos values(%s,%s,%s,%s,%s,%s,%s)",$periodo,$numControl,$fecha,$hora,$claveCal,$laboratorio,"'I'");
 	$res 	 	=  mysql_query($query);
 	if(mysql_affected_rows()>0)
 		$respuesta = true; 
@@ -327,7 +327,8 @@ function consultaMaterialPractica()
 }
 function materialesDisponibles()
 {
-	$claveSol 		= GetSQLValueString($_POST['claveSol'],"int");
+	$claveCal 		= GetSQLValueString($_POST['claveSol'],"int");
+	$claveSol 		= ObtenerClaveSol($claveCal);
 	$resp 	 		= false;
 	$contador		= 0;
 	$laboratorio 	= GetSQLValueString(consultaLab($claveSol),"text");
@@ -335,7 +336,7 @@ function materialesDisponibles()
 	$claveArt 		= "";
 	$nombreArt		= "";
 	$conexion		= conectaBDSICLAB();
-	$consulta 		= sprintf("select DISTINCT (c.nombreArticulo), c.claveArticulo from lbarticuloscat c inner join lbarticulos a on a.claveArticulo = c.claveArticulo inner join lbasignaarticulos aa on aa.indentificadorArticulo = a.identificadorArticulo where aa.claveLaboratorio =%s and a.estatus = 'V' ORDER BY c.nombreArticulo",$laboratorio);	
+	$consulta 		= sprintf("select DISTINCT (c.nombreArticulo), c.claveArticulo from lbarticuloscat c inner join lbarticulos a on a.claveArticulo = c.claveArticulo inner join lbasignaarticulos aa on aa.identificadorArticulo = a.identificadorArticulo where aa.claveLaboratorio =%s and a.estatus = 'V' ORDER BY c.nombreArticulo",$laboratorio);	
 	$res 			= mysql_query($consulta);
 	if($res)
 	{
@@ -488,22 +489,23 @@ function consultaCalExt()
 						'calendarizacion' 	=> $claveCal);
 	print json_encode($arrayJSON);
 }
-/*{
-	$clave 			= $cveSol;
-	$fe 			= $fecha;
+function ObtenerClaveSol($cveCal)
+{
+	$clave 			= $cveCal;
 	$conexion 		= conectaBDSICLAB();
-	$consulta 		= sprintf("select claveCalendarizacion from lbcalendarizaciones 
-								where claveSolicitud=%d and fechaAsignada=%s",$clave,$fe);
+	$consulta 		= sprintf("select claveSolicitud
+								from lbcalendarizaciones
+								where claveCalendarizacion = %d",$clave);
 	$res			= mysql_query($consulta);
 	if($row = mysql_fetch_array($res))
 	{
-		return (int)($row["claveCalendarizacion"]);
+		return (int)($row["claveSolicitud"]);
 	}
 	else
 	{
 		return 0;
 	}
-}*/
+}
 function consultaMaterialExterno()
 {
 	$respuesta 		= false;
@@ -591,7 +593,7 @@ function guardaEntradaExt()
 	$hora 			= GetSQLValueString($_POST["hora"],"text");
 	$numControl 	= GetSQLValueString($_POST["nControl"],"int");
 	$conexion 		= conectaBDSICLAB();
-	$query  		= sprintf("insert into lbentradasalumnos values('%s',%s,%s,%s,%s,%s,%s)",$periodo,$numControl,$fechaActual,$hora,$claveCal,$laboratorio,'E');
+	$query  		= sprintf("insert into lbentradasalumnos values('%s',%s,%s,%s,%s,%s,%s)",$periodo,$numControl,$fechaActual,$hora,$claveCal,$laboratorio,"'E'");
 	$res 	 	=  mysql_query($query);
 	if(mysql_affected_rows()>0)
 	{
@@ -604,15 +606,16 @@ function guardaEntradaExt()
 function guardaEntradaExtMat($claveCal,$numeroDep,$hora)
 {
 	date_default_timezone_set("America/Mazatlan");
+	session_start();
 	$usuario 		= $_SESSION['nombre'];
 	$laboratorio 	= GetSQLValueString(claveLab($usuario),"text");
-	$periodo 		= periodoActual();
+	$periodo 		= GetSQLValueString(periodoActual(),"text");
 	$clave 			= $claveCal;
-	$numDep 		= GetSQLValueString($numeroDep,"text");
+	$numDep 		= $numeroDep;
 	$fechaE 		= date("'Y-m-d'");
 	$horaE 			= $hora;
 	$conexion 		= conectaBDSICLAB();
-	$query  		= sprintf("insert into lbentradasalumnos values(%s,%s,%s,%s,%s,%s,%s)",$periodo,$numDep,$fechaE,$horaE,$clave,$laboratorio,'E');
+	$query  		= sprintf("insert into lbentradasalumnos values(%s,%s,%s,%s,%s,%s,%s)",$periodo,$numDep,$fechaE,$horaE,$clave,$laboratorio,"'E'");
 	$res 	 	=  mysql_query($query);
 	if(mysql_affected_rows()>0)
 	{
@@ -625,7 +628,7 @@ function guardaSolicitudExterno()
 	$respuesta 		= false;
 	$periodo 		= periodoActual();
 	$claveCal		= GetSQLValueString($_POST["claveCal"],"int");
-	$numeroDep		= GetSQLValueString($_POST["numC"],"text");
+	$numeroDep		= GetSQLValueString($_POST["numC"],"int");
 	$fecha			= GetSQLValueString($_POST["fecha"],"text");
 	$hora			= GetSQLValueString($_POST["hora"],"text");
 	$respuesta2 	= guardaEntradaExtMat($claveCal,$numeroDep,$hora);

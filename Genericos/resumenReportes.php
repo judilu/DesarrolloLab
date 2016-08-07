@@ -29,7 +29,7 @@
 	        <div class="col s7 m8 card grey lighten-3" id="grafica">
 	          
 	        </div>
-	        <div class="col s4 m4">
+	        <!-- <div class="col s4 m4">
 	          <div class="card grey lighten-3">
 	            <div class="card-content black-text">
 	              <span class="card-title">Materiales sin stock</span>
@@ -38,7 +38,7 @@
   				</table>
 	            </div>
 	          </div>
-	        </div>
+	        </div> -->
 	        <div class="col s12 m12">
 	          <div class="card grey lighten-3">
 	            <div class="card-content black-text">

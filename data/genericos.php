@@ -327,11 +327,21 @@ function eliminaSolicitudLab()
 			$respuesta = true;
 			$consulta2 = sprintf("update lbasignaarticulospracticas set estatus='B' where claveSolicitud=%d",$clave);
 			$res2 	 	=  mysql_query($consulta2);
-			if(mysql_affected_rows()>0)
+			if($res2)
 			{
 				$respuesta2 = true;
 			}
 		}
+		if(!$respuesta && !$respuesta2)
+			{
+				$consulta  	= sprintf("update lbsolicitudlaboratorios set estatus='A' where claveSolicitud=%d",$clave);
+				$res 	 	=  mysql_query($consulta);
+
+				if(mysql_affected_rows()>0)
+				{
+					$respuesta = false;
+				}
+			}
 	}
 	$arrayJSON = array('respuesta' => $respuesta,
 		'respuesta2' => $respuesta2);
@@ -1049,7 +1059,7 @@ function atenderPrestamo()
 	$renglones	= "";
 	$nombre		= "";
 	$conexion 	= conectaBDSICLAB();
-	$consulta	= sprintf("select p.ALUCTR,p.clavePrestamo,ac.claveArticulo,ac.nombreArticulo,sa.cantidad 
+	$consulta	= sprintf("select p.clavePrestamo,ac.claveArticulo,ac.nombreArticulo,sa.cantidad 
 		from lbarticuloscat ac 
 		INNER JOIN lbsolicitudarticulos sa on sa.claveArticulo=ac.claveArticulo 
 		INNER JOIN lbprestamos p on p.clavePrestamo=sa.clavePrestamo
@@ -1068,6 +1078,7 @@ function atenderPrestamo()
 		$respuesta = true;
 		$con++;
 	}
+	$nombre = consultaAlumno(consultaAlumnoPrestamo($clavePrestamo));
 	$prestamo = (rtrim($prestamo,","));
 	for($c= 0; $c< $con; $c++)
 	{
@@ -1080,9 +1091,27 @@ function atenderPrestamo()
 		$respuesta = true;
 	}
 	$salidaJSON = array('respuesta' => $respuesta,
-		'renglones' => $renglones, 
-		'clavePrestamo' => $clavePrestamo);
+						'renglones' => $renglones, 
+						'clavePrestamo' => $clavePrestamo,
+						'nombre'	=> $nombre);
 	print json_encode($salidaJSON);
+}
+function consultaAlumnoPrestamo($cve)
+{
+	$cvePrestamo = $cve;
+	$conexion 				= conectaBDSICLAB();
+	$consulta				= sprintf("select ALUCTR from lbprestamos 
+										where clavePrestamo = %d LIMIT 1",$cvePrestamo);
+	$res 					= mysql_query($consulta);
+	if($row = mysql_fetch_array($res))
+	{
+		return $row["ALUCTR"];
+	}
+	else
+	{
+		return "";
+	}
+
 }
 function agregaArticulos()
 {
@@ -1325,7 +1354,7 @@ function devolucionPrestamo()
 		INNER JOIN lbarticulos a ON ac.claveArticulo=a.claveArticulo
 		INNER JOIN lbprestamosarticulos pa on a.identificadorArticulo=pa.identificadorArticulo
 		INNER JOIN lbprestamos p on p.clavePrestamo=pa.clavePrestamo
-		where pa.estatus='P'");
+		where pa.estatus='P' and pa.clavePrestamo = %d",$clavePrestamo);
 	$res 		= mysql_query($consulta);
 
 	$renglones	.= "<thead>";
@@ -1465,6 +1494,22 @@ function guardaSancion()
 	$arrayJSON = array('respuesta' => $respuesta);
 	print json_encode($arrayJSON);
 }
+function actualizaArtSancion($cveArt)
+{
+	$cveArticulo 	= $cveArt;
+	$conexion 		= conectaBDSICLAB();
+	$consulta  		= sprintf("update lbarticulos set estatus = 'V' where identificadorArticulo = %d",$cveArticulo);
+	$res 	 		=  mysql_query($consulta);
+	if(mysql_affected_rows()>0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
 function listaAlumnosSancionados()
 {
 	$respuesta 	= false;
@@ -1476,7 +1521,7 @@ function listaAlumnosSancionados()
 	$rows		= array();
 	$renglones	= "";
 	$conexion 	= conectaBDSICLAB();
-	$consulta	= sprintf("select sa.ALUCTR,sa.inicioSancion,sa.finSancion,sa.comentarios,s.claveSancion,ac.nombreArticulo 
+	$consulta	= sprintf("select sa.ALUCTR,sa.inicioSancion,sa.finSancion,sa.comentarios,s.claveSancion,ac.nombreArticulo,art.identificadorArticulo
 		from lbsanciones s 
 		inner join lbasignasanciones sa ON sa.claveSancion=s.claveSancion 
 		INNER JOIN lbarticulos art ON art.identificadorArticulo=sa.identificadorArticulo 
@@ -1513,7 +1558,7 @@ function listaAlumnosSancionados()
 		$renglones .= "<td>".$rows[$c]["comentarios"]."</td>";
 		if($tipoUsuario != 3)
 		{
-			$renglones .= "<td><a name = '".$rows[$c]["claveSancion"]."' class='btn waves-effect waves-light green darken-2' id='btnQuitaSancion'>Quitar</a></td>";
+			$renglones .= "<td><a name = '".$rows[$c]["claveSancion"]."' id= '".$rows[$c]["identificadorArticulo"]."' class='btnQuitaSancion btn waves-effect waves-light green darken-2'>Quitar</a></td>";
 		}
 		$renglones .= "</tr>";
 		$renglones .= "</tbody>";
@@ -1528,13 +1573,19 @@ function quitaSanciones()
 	session_start();
 	$responsable 	= $_SESSION['nombre'];
 	$claveSancion 	= GetSQLValueString($_POST["claveSancion"],"int");
+	$claveArticulo	= GetSQLValueString($_POST["claveArt"],"int");
 	$fecha 			= GetSQLValueString($_POST["fecha"],"text");
 	$periodo 		= periodoActual();
 	$conexion 		= conectaBDSICLAB();
 	$consulta 		= sprintf("update lbasignasanciones set estatus='L', finSancion=%s where claveSancion=%d",$fecha,$claveSancion);
 	$res 	 		=  mysql_query($consulta);
 	if(mysql_affected_rows()>0)
-		$respuesta = true;
+	{
+		if(actualizaArtSancion($claveArticulo))
+		{
+			$respuesta = true;
+		}
+	}
 	
 	$arrayJSON = array('respuesta' => $respuesta);
 	print json_encode($arrayJSON);
@@ -2222,6 +2273,7 @@ function articuloMasPrestado()
 		$percve 	= "";
 		$nomMaestro = "";
 		$nomMat 	= "";
+		$dependencia = 0;
 		$fechaActual= date("'Y-m-d'");
 		$tipoUsu 	= tipoUsuario($responsable);
 		$solAceptadas="";
@@ -2229,15 +2281,15 @@ function articuloMasPrestado()
 		if($tipoUsu == 5)
 		{
 			$labs 		= arrayLabs(jefeDepto(claveMaestro($responsable)));
-			$consulta			= sprintf("select s.claveSolicitud,s.MATCVE,p.tituloPractica,c.fechaAsignada,c.horaAsignada,s.PERCVE 
+			$consulta			= sprintf("select s.claveDependencia,s.claveSolicitud,s.MATCVE,p.tituloPractica,c.fechaAsignada,c.horaAsignada,s.PERCVE 
 				from lbsolicitudlaboratorios as s  
 				INNER JOIN lbpracticas as p ON p.clavePractica = s.clavePractica
 				INNER JOIN lbcalendarizaciones c ON c.claveSolicitud=s.claveSolicitud
-				where s.estatus='V' and s.claveLaboratorio in(%s) and c.fechaAsignada >= %s",$labs,$fechaActual);
+				where s.estatus='V' and s.claveLaboratorio in(%s) and c.estatus='NR' and c.fechaAsignada >= %s",$labs,$fechaActual);
 		}
 		else
 		{
-			$consulta			= sprintf("select s.claveSolicitud,s.MATCVE,p.tituloPractica,c.fechaAsignada,c.horaAsignada,s.PERCVE 
+			$consulta			= sprintf("select s.claveDependencia, s.claveSolicitud,s.MATCVE,p.tituloPractica,c.fechaAsignada,c.horaAsignada,s.PERCVE 
 				from lbsolicitudlaboratorios as s 
 				INNER JOIN lbpracticas as p ON p.clavePractica = s.clavePractica
 				INNER JOIN lbcalendarizaciones c ON c.claveSolicitud=s.claveSolicitud
@@ -2264,10 +2316,19 @@ function articuloMasPrestado()
 		$solAceptadas = (rtrim($solAceptadas,","));
 		for($c= 0; $c< $con; $c++)
 		{
+			$dependencia = $rows[$c]["claveDependencia"];
 			$maestro 	= $rows[$c]["PERCVE"];
-			$nomMaestro = nomMae($maestro);
 			$cveGpo 	= $rows[$c]["MATCVE"];
-			$nomMat 	= nombreMat($cveGpo);
+			if ($dependencia == 10000000) 
+			{
+				$nomMaestro = nomMae($maestro);
+				$nomMat 	= nomMat($cveGpo);
+			}
+			else
+			{
+				$nomMaestro = consultaDep($dependencia);
+				$nomMat 	= $cveGpo;
+			}
 			$renglones .= "<tbody>";
 			$renglones .= "<tr>";
 			$renglones .= "<td>".$nomMaestro."</td>";
@@ -3052,7 +3113,6 @@ function llenarComboPracticas()
 	$mat 		= ""; //aqui guardaremos las materias que tiene ese maestro
 	$con 		= 0;
 	$rows 		= array();
-	$materias 	= clavematerias($maestro);
 	$conexion 	= conectaBDSICLAB();
 	$consulta	= sprintf("select p.tituloPractica, p.descripcion, p.duracionPractica, ap.MATCVE, l.claveLaboratorio, l.nombreLaboratorio 
 		from lbpracticas p 
@@ -3064,15 +3124,12 @@ function llenarComboPracticas()
 	{
 		$mat 		.= "'".($row["MATCVE"])."',";
 		$rows[]		= $row;
-		$mats 		= "'".$row["MATCVE"]."',";
 		$respuesta 	= true;
 		$con++;
 	}
 	$mat 			= (rtrim($mat,","));
-	
-	$mats 			= (rtrim($mats,","));
-	$datosMaterias 	= nomMaterias($mats);
 
+	$datosMaterias 	= nomMaterias($mat);
 	$nomMaterias 	= nomMat($mat);   
 	$arrayJSON = array('respuesta' => $respuesta,
 		'materias'  => $datosMaterias["materias"],
@@ -3150,6 +3207,23 @@ function asignaPractica($p,$m,$l)
 	return $respuesta;
 }
 //FIN AGREGUE
+function PeriodoFIFF ()
+{
+	$conexion 		= conectaBDSIE();
+	$ff			= "";
+	$fi			= "";
+	$periodo 		= periodoActual();
+	$consulta 		= sprintf("select PDOINI,PDOTER from DPERIO where PDOCVE =%s",$periodo);
+	$res			= mysql_query($consulta);
+	if($row = mysql_fetch_array($res))
+	{
+		$fi = $row["PDOINI"];
+		$ff = $row["PDOTER"];
+	}
+	$fechas = array('fi' => $fi,
+	 				 'ff' => $ff);
+	return $fechas;
+}
 function datosGrafica()
 {
 	session_start();
@@ -3158,8 +3232,9 @@ function datosGrafica()
 	$nombreLab = nombreLab($claveLab);
 	$nombrePdo = periodoNombre();
 	$respuesta = true;
-	$FI       = "'2016-01-28'";
-	$FF       = "'2016-06-10'";
+	$fechas  	= PeriodoFIFF();
+	$FI       = GetSQLValueString($fechas["fi"],"text");
+	$FF       = GetSQLValueString($fechas["ff"],"text");
 	$datos    = array();
 	$conexion = conectaBDSICLAB();
 	$categorias = array('MES');
@@ -3280,7 +3355,6 @@ function datosGrafica()
 		$agosto[]=$rowAg["CANTIDAD"];
 	else
 		$agosto[]=0;
-
 	$consultaSeptiembre = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=9
 		AND year(e.fechaEntrada)=year(NOW())
