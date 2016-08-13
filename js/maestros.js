@@ -318,9 +318,9 @@ var inicioMaestros = function ()
 					$("#txtCantAlumnos").val("1");
 					$("#textarea1").val("");
 					$("#txtNumArt").val("1");
-					articulos = Array();
-					articulosAgregados = Array();
-					numArticulos = Array();
+					articulos = new Array();
+					articulosAgregados = new Array();
+					numArticulos = new Array();
 					$("#bodyArt").html("");
 				}
 				else
@@ -353,9 +353,9 @@ var inicioMaestros = function ()
 	    	{
 			    $("#nuevaMaestro").hide();
 			    $("#eleccionMaterial").show("slow");
-			    articulos = Array();
-			    articulosAgregados = Array();
-			    numArticulos = Array();
+			    articulos = new Array();
+			    articulosAgregados = new Array();
+			    numArticulos = new Array();
 			    llenarcomboEleArt();
 			}
 			else
@@ -409,8 +409,8 @@ var inicioMaestros = function ()
     var llenarcomboEleArt = function()
     {
     	$("#loaderImage").show();
-    	var comboArt 	= Array();
-    	var comboclaArt = Array();
+    	var comboArt 	= new Array();
+    	var comboclaArt = new Array();
     	var c 			= articulosAgregados.length;
     	var i 			= 0;
     	var o 			= 0;	
@@ -555,9 +555,9 @@ var inicioMaestros = function ()
 	    		{
 	    			$("#loaderImage").hide();
 	    			//limpiando arreglos
-	    			articulosE 			= Array();
-    				articulosAgregadosE	= Array();
-    				numArticulosE 		= Array();
+	    			articulosE 			= new Array();
+    				articulosAgregadosE	= new Array();
+    				numArticulosE 		= new Array();
        				//llenado datos
        				$("#txtFechaSE").attr("max",response.terminaPeriodo);
        				$("#txtMateriaE").val(response.materia);
@@ -670,8 +670,8 @@ var inicioMaestros = function ()
     var llenarcomboEleArtE = function()
     {
     	$("#loaderImage").show();
-    	var comboArt 	= Array();
-    	var comboclaArt = Array();
+    	var comboArt 	= new Array();
+    	var comboclaArt = new Array();
     	var c 			= articulosAgregadosE.length;
     	var i 			= 0;
     	var o 			= 0;	
@@ -731,12 +731,12 @@ var inicioMaestros = function ()
     //Inicia función para agregarArticulos en editar
     var agregarArtE = function()
     {
-	    var cantArtE 	= parseInt($("#txtNumArt").val());
-    	var maxCantArtE = parseInt($("#txtNumArt").attr("max"));
-    	var minCantArtE = parseInt($("#txtNumArt").attr("min"));
+	    var cantArtE 	= parseInt($("#txtNumArtE").val());
+    	var maxCantArtE = parseInt($("#txtNumArtE").attr("max"));
+    	var minCantArtE = parseInt($("#txtNumArtE").attr("min"));
     	//aquiEmpieza todo
-    	if(($("#cmbMaterialCat" ).val()) != null && (cantArtE >= minCantArtE) && (cantArtE <= maxCantArtE))
-	    {	
+    	if(($("#cmbMaterialCatE" ).val()) != null && (cantArtE >= minCantArtE) && (cantArtE <= maxCantArtE))
+    	{	
 	    	var artCve = $("#cmbMaterialCatE" ).val();
 	    	var artNom = $("#cmbMaterialCatE option:selected").text();
 	    	var num    = $("#txtNumArtE").val();
@@ -960,9 +960,9 @@ var inicioMaestros = function ()
 				                    $("#txtCantAlumnos").val("1");
 				                    $("#textarea1").val("");
 				                    $("#txtNumArt").val("1");
-				                    articulos = Array();
-				                    articulosAgregados = Array();
-				                    numArticulos = Array();
+				                    articulos = new Array();
+				                    articulosAgregados = new Array();
+				                    numArticulos = new Array();
 				                    $("#bodyArt").html("");
 									//combo materia
 									$("#cmbMateria").html(" ");

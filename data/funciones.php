@@ -259,7 +259,7 @@ function existeSol ($clave)
 	}
 	return $respuesta;
 }
-/*function claveMaestro($clave)
+function claveMaestro($clave)
 {
 	$claveUsuario 	= $clave;
 	$conexion 		= conectaBDSICLAB();
@@ -273,7 +273,7 @@ function existeSol ($clave)
 	{
 		return 0;
 	}
-}*/
+}
 function clavematerias($clave)
 {
 	$maestro 		= $clave;

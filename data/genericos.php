@@ -2133,9 +2133,9 @@ function alumnosActuales()
 				where l.claveLaboratorio=%s and a.fechaEntrada = %s and a.tipoEntrada='E'",$cveLab,$fecActual);
 		}
 		$res = mysql_query($consulta);
-	if (mysql_num_rows($res)) //Si se encontraron datos en la búsqueda 
+	if ($row = mysql_fetch_array($res)) //Si se encontraron datos en la búsqueda 
 	{
-		return ["Contador2"];
+		return $row["Contador2"];
 	}
 	else
 		return 0;
