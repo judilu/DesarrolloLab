@@ -3112,7 +3112,7 @@ var inicioGenerico = function()
 	$("#btnAplicaSancion").on("click",aplicaSancion);
 	$("#btnAplicarSancion").on("click",guardaSancionAlumno);
 	$("#btnAgregarArtPrestamo").on("click",agregarArticuloPrestamo);
-	$("#btnRegresarSancion").on("click",devolucionPrestamo);
+	$("#btnRegresarSancion").on("click",prestamosProceso);//agregue ana
 	$("#btnDevolucion").on("click",devolucionPrestamo);
 	$("#btnFinalizarAtenderSol").on("click",guardarPrestamoPendiente);
 	$("#btnCancelarAtenderSol").on("click",prestamosPendientes);

@@ -939,7 +939,7 @@ function peticionesPendientesArt()
 }
 function nombreLab($claveLab)
 {
-	$cve 			= $claveLab;
+	$cve 			= GetSQLValueString($claveLab,"text");//agregue ana
 	$conexion 		= conectaBDSICLAB();
 	$consulta		= sprintf("select nombreLaboratorio from lblaboratorios where claveLaboratorio=%s",$cve);
 	$res 			= mysql_query($consulta);
@@ -949,7 +949,7 @@ function nombreLab($claveLab)
 	}
 	else
 	{
-		return 0;
+		return "";
 	}
 }
 function aceptaPeticionArticulos()
@@ -2133,7 +2133,7 @@ function alumnosActuales()
 				where l.claveLaboratorio=%s and a.fechaEntrada = %s and a.tipoEntrada='E'",$cveLab,$fecActual);
 		}
 		$res = mysql_query($consulta);
-	if ($row = mysql_fetch_array($res)) //Si se encontraron datos en la búsqueda 
+	if ($row = mysql_num_rows($res)) //Si se encontraron datos en la búsqueda 
 	{
 		return $row["Contador2"];
 	}
@@ -2190,6 +2190,13 @@ function articuloMasPrestado()
 			$renglones .= "<p style= font-size:16px;> Mas solicitado: <br> ".$rows["nombreArticulo"]." (".$rows["cantidad"].")</p>";
 			$respuesta=true; 
 		}
+		else//agregue ana
+		{
+			$renglones .= "<p>Materiales</p>";
+			$renglones .= "<p style= font-size:16px;> Mas solicitado:  </p>";
+			$respuesta=true; 
+		}
+
 		$arrayJSON = array('respuesta' => $respuesta,
 			'renglones' => $renglones);
 		print json_encode($arrayJSON);
@@ -3139,6 +3146,8 @@ function llenarComboPracticas()
 function catPracticasFiltroG()
 {
 	session_start();
+	$responsable= $_SESSION['nombre'];//agregue ana
+	$claveLab 	= GetSQLValueString(obtieneCveLab($responsable),"text"); //agregue
 	$opcion 	= $_POST["opcion"];
 	$valor 		= $_POST["valor"];
 	if ($opcion == "p.tituloPractica") 
@@ -3152,7 +3161,7 @@ function catPracticasFiltroG()
 	$rows 		= array();
 	$renglones	= "";
 	$conexion 	= conectaBDSICLAB();
-	$consulta	= sprintf("select p.tituloPractica, p.descripcion, p.duracionPractica, ap.MATCVE, l.claveLaboratorio, l.nombreLaboratorio from lbpracticas p inner join lbasignapracticas ap on p.clavePractica = ap.clavePractica inner join lblaboratorios l on ap.claveLaboratorio = l.claveLaboratorio where %s LIKE '%s' order by p.tituloPractica",$opcion,$valor);
+	$consulta	= sprintf("select p.tituloPractica, p.descripcion, p.duracionPractica, ap.MATCVE, l.claveLaboratorio, l.nombreLaboratorio from lbpracticas p inner join lbasignapracticas ap on p.clavePractica = ap.clavePractica inner join lblaboratorios l on ap.claveLaboratorio = l.claveLaboratorio where %s LIKE '%s' and l.claveLaboratorio=%s order by p.tituloPractica",$opcion,$valor,$claveLab);
 	$res 		= mysql_query($consulta);
 	$renglones	.= "<thead>";
 	$renglones	.= "<tr>";
@@ -3228,7 +3237,7 @@ function datosGrafica()
 {
 	session_start();
 	$usuario  = $_SESSION["nombre"];
-	$claveLab = GetSQLValueString(obtieneCveLab($usuario),"text");
+	$claveLab = obtieneCveLab($usuario);
 	$nombreLab = nombreLab($claveLab);
 	$nombrePdo = periodoNombre();
 	$respuesta = true;
@@ -3256,7 +3265,7 @@ function datosGrafica()
 	$consultaEnero = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=1
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resEnero = mysql_query($consultaEnero);
@@ -3269,7 +3278,7 @@ function datosGrafica()
 	$consultaFebrero = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=2
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resFeb = mysql_query($consultaFebrero);
@@ -3281,7 +3290,7 @@ function datosGrafica()
 	$consultaMarzo = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=3
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resMarzo = mysql_query($consultaMarzo);
@@ -3294,7 +3303,7 @@ function datosGrafica()
 	$consultaAbril = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=4
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resAbril = mysql_query($consultaAbril);
@@ -3307,7 +3316,7 @@ function datosGrafica()
 	$consultaMayo = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=5
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resMayo = mysql_query($consultaMayo);
@@ -3320,7 +3329,7 @@ function datosGrafica()
 	$consultaJunio = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=6
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resJunio = mysql_query($consultaJunio);
@@ -3333,7 +3342,7 @@ function datosGrafica()
 	$consultaJulio = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=7
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resJulio = mysql_query($consultaJulio);
@@ -3346,7 +3355,7 @@ function datosGrafica()
 	$consultaAgosto = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=8
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resAgosto = mysql_query($consultaAgosto);
@@ -3358,7 +3367,7 @@ function datosGrafica()
 	$consultaSeptiembre = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=9
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resSeptiembre = mysql_query($consultaSeptiembre);
@@ -3371,7 +3380,7 @@ function datosGrafica()
 	$consultaOctubre = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=10
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resOct = mysql_query($consultaOctubre);
@@ -3384,7 +3393,7 @@ function datosGrafica()
 	$consultaNoviembre = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=11
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resNov = mysql_query($consultaNoviembre);
@@ -3397,7 +3406,7 @@ function datosGrafica()
 	$consultaDiciembre = sprintf("select count(month(fechaEntrada))as CANTIDAD from lbentradasalumnos e
 		WHERE month(e.fechaEntrada)=12
 		AND year(e.fechaEntrada)=year(NOW())
-		and e.claveLaboratorio=%s
+		and e.claveLaboratorio='%s'
 		and e.fechaEntrada between %s and %s
 		group by month(e.fechaEntrada)",$claveLab,$FI,$FF);
 	$resD = mysql_query($consultaDiciembre);
