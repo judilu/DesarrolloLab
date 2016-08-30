@@ -275,8 +275,9 @@ function editarSolicitud ()
 	$solId 			= GetSQLValueString($_POST['solId'],"int");
 	$solicitud  	= mostrarSolicitud($clave,$solId);
 	$claveMat 		= $solicitud['MATCVE'];
+	$grupo 			= $solicitud['GPOCVE'];
 	$mat 	 		= nomMat("'".$claveMat."'");
-    $horas 			= horaMat($claveMat,$clave);
+    $horas 			= horaMat($claveMat,$grupo,$clave);
     $materia 		= $mat[$claveMat];
     $claveSol 		= $solicitud['claveSolicitud'];
     $fechaPrac 		= $solicitud['fechaSolicitud'];

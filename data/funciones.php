@@ -358,14 +358,15 @@ function grupo($mat,$per,$pdo,$hor)
 		return "";
 	}
 }
-function horaMat($mat,$per)
+function horaMat($mat,$gpo,$per)
 {
-	$materia    = $mat;
+	$materia    = GetSQLValueString($mat,"text");
+	$grupo 		= GetSQLValueString($gpo,"text");
 	$maestro   	= $per;
 	$periodo 	= periodoActual();
 	$horas 		= array("");  
 	$conexion 	= conectaBDSIE();
-	$consulta 	= sprintf("select LUNHRA, MARHRA,MIEHRA,JUEHRA,VIEHRA from DGRUPO where MATCVE ='TIB1025' and PERCVE=920 and PDOCVE ='2161'",$materia,$maestro,$periodo);
+	$consulta 	= sprintf("select LUNHRA, MARHRA,MIEHRA,JUEHRA,VIEHRA from DGRUPO where MATCVE =%s and GPOCVE =%s and PERCVE=%d and PDOCVE =%s",$materia,$grupo,$maestro,$periodo);
 	$res		= mysql_query($consulta);
 	if($row = mysql_fetch_array($res))
 	{
@@ -658,7 +659,7 @@ function capacidadLab()
 	$respuesta 		= false;
 	$capacidad 		= 0;
 	$conexion		= conectaBDSICLAB();
-	$consulta		= sprintf("	select capacidad from lblaboratorios where claveLaboratorio =%s",$laboratorio);
+	$consulta		= sprintf("select capacidad from lblaboratorios where claveLaboratorio =%s",$laboratorio);
 	$res 			= mysql_query($consulta);
 	if($row = mysql_fetch_array($res))
 	{
